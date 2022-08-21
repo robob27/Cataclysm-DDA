@@ -7081,6 +7081,14 @@ bool vehicle::is_foldable() const
     return true;
 }
 
+bool vehicle::is_appliance() const
+{
+    if( has_tag( flag_APPLIANCE ) ) {
+        return true;
+    }
+    return false;
+}
+
 bool vehicle::restore( const std::string &data )
 {
     std::istringstream veh_data( data );

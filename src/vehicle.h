@@ -1752,6 +1752,8 @@ class vehicle
 
         // Consists only of parts with the FOLDABLE tag.
         bool is_foldable() const;
+        // Is an appliance with the flag_APPLIANCE flag
+        bool is_appliance() const;
         // Restore parts of a folded vehicle.
         bool restore( const std::string &data );
         //handles locked vehicles interaction

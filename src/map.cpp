@@ -538,13 +538,15 @@ void map::vehmove()
         }
         level_cache &cache = *cache_lazy;
         for( vehicle *veh : cache.vehicle_list ) {
-            if( veh->is_following ) {
-                veh->drive_to_local_target( getabs( player_pos ), true );
-            } else if( veh->is_patrolling ) {
-                veh->autopilot_patrol();
+            if( !veh->is_appliance() ) {
+                if( veh->is_following ) {
+                    veh->drive_to_local_target( getabs( player_pos ), true );
+                } else if( veh->is_patrolling ) {
+                    veh->autopilot_patrol();
+                }
+                veh->gain_moves();
+                veh->slow_leak();
             }
-            veh->gain_moves();
-            veh->slow_leak();
             wrapped_vehicle w;
             w.v = veh;
             vehicle_list.push_back( w );

@@ -31,6 +31,7 @@ static const vproto_id vehicle_prototype_none( "none" );
 
 static const std::string flag_APPLIANCE( "APPLIANCE" );
 static const std::string flag_WIRING( "WIRING" );
+static const std::string flag_CANT_DRAG( "CANT_DRAG" );
 
 
 // Width of the entire set of windows. 60 is sufficient for
@@ -69,6 +70,9 @@ void place_appliance( const tripoint &p, const vpart_id &vpart, const cata::opti
     veh->name = vpart->name();
 
     veh->add_tag( flag_APPLIANCE );
+    if( veh->is_powergrid() ) {
+        veh->add_tag( flag_CANT_DRAG );
+    }
 
     // Update the vehicle cache immediately,
     // or the appliance will be invisible for the first couple of turns.

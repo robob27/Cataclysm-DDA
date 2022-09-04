@@ -1480,6 +1480,7 @@ void construct::done_wiring( const tripoint_bub_ms &p, Character &/*who*/ )
     veh->add_tag( flag_APPLIANCE );
     veh->add_tag( flag_WIRING );
 
+
     // Merge any neighbouring wire vehicles into this one if the resulting vehicle would not be too large.
     for( const point &offset : four_adjacent_offsets ) {
         const optional_vpart_position vp = here.veh_at( p + offset );
@@ -1492,6 +1493,7 @@ void construct::done_wiring( const tripoint_bub_ms &p, Character &/*who*/ )
             veh->merge_appliance_into_grid( veh_target );
         }
     }
+    veh->face.init( 0_degrees );
 
     // Update the vehicle cache immediately,
     // or the wiring will be invisible for the first couple of turns.

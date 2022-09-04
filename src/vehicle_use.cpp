@@ -1708,7 +1708,9 @@ static bool tool_wants_battery( const itype_id &type )
                              tracking_on ? _( "Forget vehicle position" ) : _( "Remember vehicle position" ) );
     } else {
         selectmenu.addentry( PLUG, true, 'g', _( "Plug in appliance" ) );
-        selectmenu.addentry( MERGE, true, 'm', _( "Merge appliance" ) );
+        if( is_powergrid() ) {
+            selectmenu.addentry( MERGE, true, 'm', _( "Merge appliance" ) );
+        }
     }
     if( vp_controls ) {
         selectmenu.addentry( HANDBRAKE, true, 'h', _( "Pull handbrake" ) );
@@ -2180,15 +2182,25 @@ void vehicle::build_interact_menu( veh_menu &menu, const tripoint &p, bool with_
                 return;
             }
             const tripoint target_pos = get_player_character().pos() + * dir;
+            if( rl_dist( vp.pos(), target_pos ) > 1 ) {
+                popup( _( "Can only merge appliances that are directly adjacent." ) );
+                return;
+            }
             const optional_vpart_position target_vp = here.veh_at( target_pos );
             if( !target_vp ) {
                 return;
             }
             vehicle &target_veh = target_vp->vehicle();
-
-            if( target_veh.has_tag( flag_APPLIANCE ) ) {
-                merge_appliance_into_grid( target_veh );
+            if( !target_veh.has_tag( flag_APPLIANCE ) ) {
+                popup( _( "Target must be an appliance." ) );
+                return;
             }
+            if( !target_veh.is_powergrid() ) {
+                popup( _( "A powergrid must be wires, power generation or batteries." ) );
+                return;
+            }
+            merge_appliance_into_grid( target_veh );
+
             return;
         }
         default: {

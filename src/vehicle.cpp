@@ -124,6 +124,8 @@ static const std::string flag_E_COMBUSTION( "E_COMBUSTION" );
 
 static const std::string flag_APPLIANCE( "APPLIANCE" );
 static const std::string flag_CANT_DRAG( "CANT_DRAG" );
+static const std::string flag_WIRING( "WIRING" );
+static const std::string flag_REACTOR( "REACTOR" );
 
 static bool is_sm_tile_outside( const tripoint &real_global_pos );
 static bool is_sm_tile_over_water( const tripoint &real_global_pos );
@@ -1868,6 +1870,18 @@ void vehicle::merge_appliance_into_grid( vehicle &veh_target )
             add_tag( flag_CANT_DRAG );
         }
     }
+}
+
+bool vehicle::is_powergrid()
+{
+    if( !has_tag( flag_APPLIANCE ) ) {
+        return false;
+    }
+    int total_power_generation = total_alternator_epower_w() + total_solar_epower_w() +
+                                 total_water_wheel_epower_w() + total_wind_epower_w() + total_engine_epower_w();
+
+    return  total_power_generation > 0 || !batteries.empty() || has_tag( flag_WIRING ) ||
+            has_part( flag_REACTOR );
 }
 
 /**

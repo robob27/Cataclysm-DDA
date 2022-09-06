@@ -2182,10 +2182,6 @@ void vehicle::build_interact_menu( veh_menu &menu, const tripoint &p, bool with_
                 return;
             }
             const tripoint target_pos = get_player_character().pos() + * dir;
-            if( rl_dist( vp.pos(), target_pos ) > 1 ) {
-                popup( _( "Can only merge appliances that are directly adjacent." ) );
-                return;
-            }
             const optional_vpart_position target_vp = here.veh_at( target_pos );
             if( !target_vp ) {
                 return;

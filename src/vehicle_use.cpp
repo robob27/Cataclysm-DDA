@@ -2177,7 +2177,7 @@ void vehicle::build_interact_menu( veh_menu &menu, const tripoint &p, bool with_
             return;
         }
         case MERGE: {
-            const cata::optional<tripoint> dir = choose_direction( _( "Merge the apliance into which grid?" ) );
+            const cata::optional<tripoint> dir = choose_direction( _( "Merge the appliance into which grid?" ) );
             if( !dir ) {
                 return;
             }
@@ -2196,7 +2196,7 @@ void vehicle::build_interact_menu( veh_menu &menu, const tripoint &p, bool with_
                 return;
             }
             if( !target_veh.is_powergrid() ) {
-                popup( _( "A powergrid must be wires, power generation or batteries." ) );
+                popup( _( "A power grid must be wires, power generation or batteries." ) );
                 return;
             }
             merge_appliance_into_grid( target_veh );

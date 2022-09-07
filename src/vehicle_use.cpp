@@ -2177,7 +2177,8 @@ void vehicle::build_interact_menu( veh_menu &menu, const tripoint &p, bool with_
             return;
         }
         case MERGE: {
-            const cata::optional<tripoint> dir = choose_direction( _( "Merge the appliance into which grid?" ) );
+            const cata::optional<tripoint> dir = choose_direction(
+                    _( "Merge the appliance into which grid?" ) );
             if( !dir ) {
                 return;
             }

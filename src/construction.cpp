@@ -1493,7 +1493,6 @@ void construct::done_wiring( const tripoint_bub_ms &p, Character &/*who*/ )
             veh->merge_appliance_into_grid( veh_target );
         }
     }
-    veh->face.init( 0_degrees );
 
     // Update the vehicle cache immediately,
     // or the wiring will be invisible for the first couple of turns.

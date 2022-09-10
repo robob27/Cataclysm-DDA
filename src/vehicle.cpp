@@ -1849,6 +1849,8 @@ void vehicle::merge_appliance_into_grid( vehicle &veh_target )
         return;
     }
 
+    bool has_wires = has_tag( flag_WIRING ) || veh_target.has_tag( flag_WIRING );
+
     bounding_box vehicle_box = get_bounding_box( false );
     point size;
     size.x = std::abs( ( vehicle_box.p2 - vehicle_box.p1 ).x ) + 1;
@@ -1867,6 +1869,10 @@ void vehicle::merge_appliance_into_grid( vehicle &veh_target )
         } else {
             //The grid needs to stay undraggable
             add_tag( flag_CANT_DRAG );
+            name = _( "power grid" );
+            if( has_wires ) {
+                add_tag( flag_WIRING );
+            }
         }
     }
 }
@@ -6594,7 +6600,8 @@ void vehicle::remove_remote_part( int part_num )
     }
 }
 
-void vehicle::shed_loose_parts( const tripoint_bub_ms *src, const tripoint_bub_ms *dst )
+void vehicle::shed_loose_parts( const tripoint_bub_ms *src, const tripoint_bub_ms *dst,
+                                const point  *mount )
 {
     map &here = get_map();
     // remove_part rebuilds the loose_parts vector, so iterate over a copy to preserve
@@ -6604,6 +6611,16 @@ void vehicle::shed_loose_parts( const tripoint_bub_ms *src, const tripoint_bub_m
         if( std::find( loose_parts.begin(), loose_parts.end(), elem ) == loose_parts.end() ) {
             // part was removed elsewhere
             continue;
+        }
+        if( mount ) {
+            // skip parts that are not at the mount point
+            std::vector<int> rel_parts = parts_at_relative( *mount, true );
+            if( rel_parts.empty() ||
+                std::find( rel_parts.begin(), rel_parts.end(), elem ) == rel_parts.end() ) {
+                continue;
+
+            }
+
         }
         if( part_flag( elem, "POWER_TRANSFER" ) ) {
             int distance = rl_dist( here.getabs( bub_part_pos( parts[elem] ) ), parts[elem].target.second );

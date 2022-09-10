@@ -1681,7 +1681,8 @@ class vehicle
         void shift_parts( map &here, const point &delta );
         bool shift_if_needed( map &here );
 
-        void shed_loose_parts( const tripoint_bub_ms *src = nullptr, const tripoint_bub_ms *dst = nullptr );
+        void shed_loose_parts( const tripoint_bub_ms *src = nullptr, const tripoint_bub_ms *dst = nullptr,
+                               const point *mount = nullptr );
 
         /**
          * @name Vehicle turrets

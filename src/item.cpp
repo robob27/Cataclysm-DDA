@@ -7634,7 +7634,11 @@ void item::calc_rot( units::temperature temp, const float spoil_modifier,
         rot += rng( -spoil_variation, spoil_variation );
     }
 
+    add_msg_debug(debugmode::DF_ROT, "Rot for %s before calc_rot: %s", tname(), to_string_clipped(rot));
+
     rot += factor * time_delta / 1_hours * calc_hourly_rotpoints_at_temp( temp ) * 1_turns;
+
+    add_msg_debug(debugmode::DF_ROT, "Rot for %s after calc_rot: %s", tname(), to_string_clipped(rot));
 }
 
 void item::calc_rot_while_processing( time_duration processing_duration )
@@ -12546,6 +12550,7 @@ bool item::process_temperature_rot( float insulation, const tripoint &pos, map &
     // if player debug menu'd the time backward it breaks stuff, just reset the
     // last_temp_check in this case
     if( now - last_temp_check < 0_turns ) {
+        add_msg_debug(debugmode::DF_ROT, "Resetting last_temp_check for %s due to time debug", tname());
         reset_temp_check();
         return false;
     }
@@ -12592,7 +12597,7 @@ bool item::process_temperature_rot( float insulation, const tripoint &pos, map &
 
     if( now - time > 1_hours ) {
         // This code is for items that were left out of reality bubble for long time
-
+        add_msg_debug(debugmode::DF_ROT, "Processing item left out of reality bubble for 1 hour or more: %s", tname());
         const weather_generator &wgen = get_weather().get_cur_weather_gen();
         const unsigned int seed = g->get_seed();
         units::temperature local_mod = g->new_game ? 0_K : here.get_temperature_mod( pos );

@@ -3456,6 +3456,12 @@ void vehicle::deserialize( const JsonObject &data )
         }
     }
 
+    for (item_reference& active_item_ref : active_items.get_for_processing()) {
+        const item& target = *active_item_ref.item_ref;
+
+        debugmsg("Active vehicle (%s) item: %s", name, target.tname());
+    }
+
     for( const vpart_reference &vp : get_any_parts( "TURRET" ) ) {
         install_part( vp.mount(), vpart_turret_mount );
 

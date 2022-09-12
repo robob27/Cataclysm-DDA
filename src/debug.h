@@ -266,6 +266,7 @@ enum debug_filter : int {
     DF_RADIO, // radio stuff
     DF_RANGED, // ranged generic
     DF_REQUIREMENTS_MAP, // activity_item_handler requirements_map()
+    DF_ROT, // perishable item stuff
     DF_SOUND, // sound generic
     DF_TALKER, // talker generic
     DF_VEHICLE, // vehicle generic

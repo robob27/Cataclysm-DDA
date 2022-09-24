@@ -3,6 +3,7 @@
 #include "inventory.h"
 #include "itype.h"
 #include "map_iterator.h"
+#include "action.h"
 #include "output.h"
 #include "overmapbuffer.h"
 #include "player_activity.h"
@@ -294,6 +295,13 @@ bool veh_app_interact::can_unplug()
     } );
 }
 
+bool veh_app_interact::can_merge()
+{
+    return veh->is_powergrid();
+}
+
+
+
 // Helper function for selecting a part in the parts list.
 // If only one part is available, don't prompt the player.
 static vehicle_part *pick_part( const std::vector<vehicle_part *> &parts,
@@ -540,6 +548,13 @@ void veh_app_interact::populate_app_actions()
     imenu.addentry( -1, can_unplug(), ctxt.keys_bound_to( "UNPLUG" ).front(),
                     ctxt.get_action_name( "UNPLUG" ) );
 
+    // Merge
+    app_actions.emplace_back( [this]() {
+        merge();
+    } );
+    imenu.addentry( -1, can_merge(), ctxt.keys_bound_to( "MERGE" ).front(),
+                    ctxt.get_action_name( "MERGE" ) );
+
     /*************** Get part-specific actions ***************/
     veh_menu menu( veh, "IF YOU SEE THIS IT IS A BUG" );
     veh->build_interact_menu( menu, veh->mount_to_tripoint( a_point ), false );
@@ -551,6 +566,34 @@ void veh_app_interact::populate_app_actions()
         app_actions.emplace_back( it._on_submit );
     }
     imenu.setup();
+}
+
+void veh_app_interact::merge()
+{
+    const cata::optional<tripoint> dir = choose_direction(
+            _( "Merge the appliance into which grid?" ) );
+    if( !dir ) {
+        return;
+    }
+
+    const tripoint target_pos = get_player_character().pos() + *dir;
+    map &here = get_map();
+    const optional_vpart_position target_vp = here.veh_at( target_pos );
+    if( !target_vp ) {
+        return;
+    }
+    vehicle &target_veh = target_vp->vehicle();
+    if( !target_veh.has_tag( flag_APPLIANCE ) ) {
+        popup( _( "Target must be an appliance." ) );
+        return;
+    }
+    if( !target_veh.is_powergrid() ) {
+        popup( _( "A power grid must be wires, power generation or batteries." ) );
+        return;
+    }
+    veh->merge_appliance_into_grid( target_veh );
+
+    return;
 }
 
 shared_ptr_fast<ui_adaptor> veh_app_interact::create_or_get_ui_adaptor()

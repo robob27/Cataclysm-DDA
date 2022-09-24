@@ -517,6 +517,7 @@ void vehicle::plug_in( const tripoint &pos )
         powercord.get_use( "CABLE_ATTACH" )->call( get_player_character(), powercord, powercord.active,
                 pos );
     }
+
 }
 
 void vehicle::connect( const tripoint &source_pos, const tripoint &target_pos )
@@ -1654,7 +1655,6 @@ static bool tool_wants_battery( const itype_id &type )
            tool.ammo_capacity( ammo_battery ) > 0;
 }
 
-
 static bool use_vehicle_tool( vehicle &veh, const tripoint &vp_pos, const itype_id &tool_type )
 {
     item pseudo( tool_type, calendar::turn_zero );
@@ -1857,8 +1857,8 @@ void vehicle::build_interact_menu( veh_menu &menu, const tripoint &p, bool with_
 
             smart_controller_settings cfg_view = smart_controller_settings(
                 has_enabled_smart_controller,
-                smart_controller_cfg->battery_lo,
-                smart_controller_cfg->battery_hi );
+                smart_controller_cfg -> battery_lo,
+                smart_controller_cfg -> battery_hi );
             smart_controller_ui( cfg_view ).control();
             for( const vpart_reference &vp : get_avail_parts( "SMART_ENGINE_CONTROLLER" ) )
             {

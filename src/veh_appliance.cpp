@@ -300,8 +300,6 @@ bool veh_app_interact::can_merge()
     return veh->is_powergrid();
 }
 
-
-
 // Helper function for selecting a part in the parts list.
 // If only one part is available, don't prompt the player.
 static vehicle_part *pick_part( const std::vector<vehicle_part *> &parts,

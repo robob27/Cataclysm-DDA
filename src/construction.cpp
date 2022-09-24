@@ -123,8 +123,6 @@ static const std::string flag_APPLIANCE( "APPLIANCE" );
 static const std::string flag_CANT_DRAG( "CANT_DRAG" );
 static const std::string flag_WIRING( "WIRING" );
 
-static const int MAX_WIRE_VEHICLE_SIZE = 24;
-
 static bool finalized = false;
 
 // Construction functions.
@@ -1489,25 +1487,10 @@ void construct::done_wiring( const tripoint_bub_ms &p, Character &/*who*/ )
             continue;
         }
 
-        bounding_box vehicle_box = veh->get_bounding_box( false );
-        point size;
-        size.x = std::abs( ( vehicle_box.p2 - vehicle_box.p1 ).x ) + 1;
-        size.y = std::abs( ( vehicle_box.p2 - vehicle_box.p1 ).y ) + 1;
-
         vehicle &veh_target = vp->vehicle();
-        if( &veh_target != veh && veh_target.has_tag( flag_WIRING ) ) {
-            bounding_box target_vehicle_box = veh_target.get_bounding_box( false );
 
-            point target_size;
-            target_size.x = std::abs( ( target_vehicle_box.p2 - target_vehicle_box.p1 ).x ) + 1;
-            target_size.y = std::abs( ( target_vehicle_box.p2 - target_vehicle_box.p1 ).y ) + 1;
-
-            if( size.x + target_size.x <= MAX_WIRE_VEHICLE_SIZE &&
-                size.y + target_size.y <= MAX_WIRE_VEHICLE_SIZE ) {
-                if( !veh->merge_vehicle_parts( &veh_target ) ) {
-                    debugmsg( "failed to merge vehicle parts" );
-                }
-            }
+        if( veh_target.has_tag( flag_WIRING ) ) {
+            veh->merge_appliance_into_grid( veh_target );
         }
     }
 

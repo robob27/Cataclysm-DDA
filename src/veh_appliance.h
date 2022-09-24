@@ -103,6 +103,12 @@ class veh_app_interact
          * can be disconnected by the player.
          * @returns True if the appliance can be unplugged.
         */
+        bool can_merge();
+        /**
+         * Checks whether the current appliance is considered a "power grid"
+         * that could be merged with another power grid.
+         * @returns True if the appliance can be merged.
+        */
         bool can_unplug();
         /**
          * Function associated with the "REFILL" action.
@@ -140,6 +146,11 @@ class veh_app_interact
          * any used cable items on the ground.
         */
         void unplug();
+        /**
+        * Function associated with the "MERGE" action.
+        * Merge power grid elements together into a single appliance
+        */
+        void merge();
         /**
          * The main loop of the appliance UI. Redraws windows, checks for input, and
          * performs selected actions. The loop exits once an activity is assigned

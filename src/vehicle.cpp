@@ -123,12 +123,16 @@ static const zone_type_id zone_type_VEHICLE_PATROL( "VEHICLE_PATROL" );
 static const std::string flag_E_COMBUSTION( "E_COMBUSTION" );
 
 static const std::string flag_APPLIANCE( "APPLIANCE" );
+static const std::string flag_WIRING( "WIRING" );
+static const std::string flag_CANT_DRAG( "CANT_DRAG" );
 
 static bool is_sm_tile_outside( const tripoint &real_global_pos );
 static bool is_sm_tile_over_water( const tripoint &real_global_pos );
 
 // 1 kJ per battery charge
 static const int bat_energy_j = 1000;
+
+static const int MAX_WIRE_VEHICLE_SIZE = 24;
 
 void DefaultRemovePartHandler::removed( vehicle &veh, const int part )
 {
@@ -208,6 +212,45 @@ vehicle::vehicle() : vehicle( get_map(), vproto_id() )
 }
 
 vehicle::~vehicle() = default;
+
+bool vehicle::is_powergrid() const
+{
+    if( !has_tag( flag_APPLIANCE ) ) {
+        return false;
+    }
+
+    return  !solar_panels.empty() || !reactors.empty() || !wind_turbines.empty() ||
+            !water_wheels.empty() || !alternators.empty() || !batteries.empty() || has_tag( flag_WIRING );
+}
+
+void vehicle::merge_appliance_into_grid( vehicle &veh_target )
+{
+    if( &veh_target == this ) {
+        return;
+    }
+
+    bounding_box vehicle_box = get_bounding_box( false );
+    point size;
+    size.x = std::abs( ( vehicle_box.p2 - vehicle_box.p1 ).x ) + 1;
+    size.y = std::abs( ( vehicle_box.p2 - vehicle_box.p1 ).y ) + 1;
+
+    bounding_box target_vehicle_box = veh_target.get_bounding_box( false );
+
+    point target_size;
+    target_size.x = std::abs( ( target_vehicle_box.p2 - target_vehicle_box.p1 ).x ) + 1;
+    target_size.y = std::abs( ( target_vehicle_box.p2 - target_vehicle_box.p1 ).y ) + 1;
+    //Make sur the resulting vehicle would not be too large
+    if( size.x + target_size.x <= MAX_WIRE_VEHICLE_SIZE &&
+        size.y + target_size.y <= MAX_WIRE_VEHICLE_SIZE ) {
+        if( !merge_vehicle_parts( &veh_target ) ) {
+            debugmsg( "failed to merge vehicle parts" );
+        } else {
+            //The grid needs to stay undraggable
+            add_tag( flag_CANT_DRAG );
+            name = _( "power grid" );
+        }
+    }
+}
 
 bool vehicle::player_in_control( const Character &p ) const
 {
@@ -6586,7 +6629,8 @@ void vehicle::remove_remote_part( int part_num )
     }
 }
 
-void vehicle::shed_loose_parts( const tripoint_bub_ms *src, const tripoint_bub_ms *dst )
+void vehicle::shed_loose_parts( const tripoint_bub_ms *src, const tripoint_bub_ms *dst,
+                                const point *mount )
 {
     map &here = get_map();
     // remove_part rebuilds the loose_parts vector, so iterate over a copy to preserve
@@ -6596,6 +6640,16 @@ void vehicle::shed_loose_parts( const tripoint_bub_ms *src, const tripoint_bub_m
         if( std::find( loose_parts.begin(), loose_parts.end(), elem ) == loose_parts.end() ) {
             // part was removed elsewhere
             continue;
+        }
+        if( mount ) {
+            // skip parts that are not at the mount point
+            std::vector<int> rel_parts = parts_at_relative( *mount, true );
+            if( rel_parts.empty() ||
+                std::find( rel_parts.begin(), rel_parts.end(), elem ) == rel_parts.end() ) {
+                continue;
+
+            }
+
         }
         if( part_flag( elem, "POWER_TRANSFER" ) ) {
             int distance = rl_dist( here.getabs( bub_part_pos( parts[elem] ) ), parts[elem].target.second );

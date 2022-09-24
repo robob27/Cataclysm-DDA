@@ -3493,13 +3493,14 @@ void veh_interact::complete_vehicle( Character &you )
 
             // Remove any leftover power cords from the appliance
             if( appliance_removal && veh->part_count() >= 2 ) {
-                veh->shed_loose_parts();
-                veh->part_removal_cleanup();
+                if( appliance_removal ) {
+                    veh->shed_loose_parts( nullptr, nullptr, &veh->part( vehicle_part ).mount );
+                }
                 //always stop after removing an appliance
                 you.activity.set_to_null();
             }
 
-            if( veh->part_count( true ) < 2 ) {
+            if( veh->part_count( true ) - veh->removed_part_count < 2 ) {
                 you.add_msg_if_player( _( "You completely dismantle the %s." ), veh->name );
                 you.activity.set_to_null();
                 // destroy vehicle clears the cache

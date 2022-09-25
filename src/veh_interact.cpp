@@ -3498,7 +3498,7 @@ void veh_interact::complete_vehicle( Character &you )
                 you.activity.set_to_null();
             }
 
-            if( veh->part_count( true ) - veh->removed_part_count < 2 ) {
+            if( veh->part_count( true ) - veh->removed_part_count < 1 ) {
                 you.add_msg_if_player( _( "You completely dismantle the %s." ), veh->name );
                 you.activity.set_to_null();
                 // destroy vehicle clears the cache
